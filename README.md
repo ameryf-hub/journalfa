@@ -43,3 +43,14 @@ Use this when you deploy from your Railway account:
 
 - The app is protected by one username/password pair you control through environment variables.
 - Sessions are stored in a secure HTTP-only cookie and expire after 14 days of inactivity.
+
+## Troubleshooting
+
+### Cannot GET /
+
+If you open the app and see `Cannot GET /`, the frontend bundle is usually missing for the current server mode.
+
+- For local development, run `npm run dev` and open `http://localhost:5173`.
+- For production-style local run, build first with `npm run build`, then run `npm start` and open `http://localhost:3000`.
+
+If the build is missing, the server now returns a helpful JSON message at `/` explaining these steps.

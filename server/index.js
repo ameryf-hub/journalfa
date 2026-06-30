@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import session from 'express-session';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createEntry, deleteEntry, listEntries, updateEntry } from './db.js';
@@ -151,12 +152,21 @@ app.delete('/api/entries/:id', requireAuth, async (request, response, next) => {
   }
 });
 
-if (isProduction) {
-  const distPath = path.resolve(__dirname, '../dist');
+const distPath = path.resolve(__dirname, '../dist');
+const hasBuiltClient = fs.existsSync(path.join(distPath, 'index.html'));
+
+if (hasBuiltClient) {
   app.use(express.static(distPath));
 
   app.get('*', (_request, response) => {
     response.sendFile(path.join(distPath, 'index.html'));
+  });
+} else {
+  app.get('/', (_request, response) => {
+    response.status(200).json({
+      message:
+        'Frontend build not found. Run "npm run build" before "npm start", or use "npm run dev" for local development.'
+    });
   });
 }
 
