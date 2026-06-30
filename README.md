@@ -27,6 +27,18 @@ The frontend runs on Vite and proxies API requests to the backend on port `3000`
 
 The app uses the `build` script to create the frontend bundle and `npm start` for the production server.
 
+## Railway checklist
+
+Use this when you deploy from your Railway account:
+
+1. Create a new Railway project from this GitHub repository.
+2. Attach a Railway PostgreSQL database to the project.
+3. Copy the database connection string into `DATABASE_URL`.
+4. Set `APP_USERNAME`, `APP_PASSWORD`, and `SESSION_SECRET` in Railway Variables.
+5. Add your Railway app URL to `ALLOWED_ORIGINS`.
+6. Deploy and open the public Railway domain.
+7. Sign in with the username and password you configured.
+
 ## Authentication
 
 - The app is protected by one username/password pair you control through environment variables.
