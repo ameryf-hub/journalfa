@@ -1,3 +1,6 @@
 node_modules
+.vite
+dist
 .env
+.env.local
 google-credentials.json

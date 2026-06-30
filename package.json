@@ -1,35 +1,30 @@
 {
-  "name": "fa_ai",
+  "name": "fa_ai_private",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Tests passed\" && exit 0"
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "node --watch server/index.js",
+    "dev:client": "vite",
+    "build": "vite build",
+    "start": "node server/index.js"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "axios": "^1.17.0",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "googleapis": "^173.0.0"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-session": "^1.18.2",
+    "pg": "^8.13.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
-  "directories": {
-    "doc": "docs"
-  },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ameryf-hub/fa_ai.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ameryf-hub/fa_ai/issues"
-  },
-  "homepage": "https://github.com/ameryf-hub/fa_ai#readme"
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "vite": "^6.1.0"
+  }
 }
