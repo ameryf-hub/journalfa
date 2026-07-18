@@ -9,20 +9,69 @@ if (!connectionString) {
 
 const pool = new Pool({
   connectionString,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: resolveSsl(connectionString)
 });
 
-await pool.query(`
-  create table if not exists journal_entries (
-    id bigserial primary key,
-    title text not null default '',
-    content text not null,
-    mood text not null default '',
-    tags text[] not null default '{}',
-    created_at timestamptz not null default now(),
-    updated_at timestamptz not null default now()
-  )
-`);
+// Prevent an unexpected reset on an idle client from crashing the process.
+pool.on('error', (error) => {
+  console.error('Unexpected Postgres pool error:', error.message);
+});
+
+await initSchema();
+
+function resolveSsl(url) {
+  // Allow an explicit override via env var.
+  if (process.env.PGSSL === 'true') {
+    return { rejectUnauthorized: false };
+  }
+
+  if (process.env.PGSSL === 'false') {
+    return false;
+  }
+
+  let host = '';
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    host = '';
+  }
+
+  // Railway's private network and local Postgres do not use TLS.
+  if (!host || host === 'localhost' || host === '127.0.0.1' || host.endsWith('.railway.internal')) {
+    return false;
+  }
+
+  // Public/proxy endpoints (e.g. *.proxy.rlwy.net) require TLS.
+  return { rejectUnauthorized: false };
+}
+
+async function initSchema(retries = 5, delayMs = 2000) {
+  for (let attempt = 1; attempt <= retries; attempt += 1) {
+    try {
+      await pool.query(`
+        create table if not exists journal_entries (
+          id bigserial primary key,
+          title text not null default '',
+          content text not null,
+          mood text not null default '',
+          tags text[] not null default '{}',
+          created_at timestamptz not null default now(),
+          updated_at timestamptz not null default now()
+        )
+      `);
+      return;
+    } catch (error) {
+      if (attempt === retries) {
+        throw error;
+      }
+
+      console.error(
+        `Schema init failed (attempt ${attempt}/${retries}): ${error.message}. Retrying in ${delayMs}ms.`
+      );
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+}
 
 export async function listEntries() {
   const { rows } = await pool.query(
