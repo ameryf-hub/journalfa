@@ -136,6 +136,7 @@ export default function App() {
 
       const response = await fetch(editingId ? `/api/entries/${editingId}` : '/api/entries', {
         method: editingId ? 'PUT' : 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -174,7 +175,10 @@ export default function App() {
 
     try {
       setError('');
-      const response = await fetch(`/api/entries/${entryId}`, { method: 'DELETE' });
+      const response = await fetch(`/api/entries/${entryId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
       if (!response.ok && response.status !== 204) {
         throw new Error('Unable to delete entry');
       }

@@ -123,8 +123,15 @@ app.post('/api/entries', requireAuth, async (request, response, next) => {
 
 app.put('/api/entries/:id', requireAuth, async (request, response, next) => {
   try {
+    const id = parseEntryId(request.params.id);
+
+    if (id === null) {
+      response.status(404).json({ error: 'Entry not found' });
+      return;
+    }
+
     const payload = parseEntryPayload(request.body);
-    const updated = await updateEntry(request.params.id, payload);
+    const updated = await updateEntry(id, payload);
 
     if (!updated) {
       response.status(404).json({ error: 'Entry not found' });
@@ -139,7 +146,14 @@ app.put('/api/entries/:id', requireAuth, async (request, response, next) => {
 
 app.delete('/api/entries/:id', requireAuth, async (request, response, next) => {
   try {
-    const removed = await deleteEntry(request.params.id);
+    const id = parseEntryId(request.params.id);
+
+    if (id === null) {
+      response.status(404).json({ error: 'Entry not found' });
+      return;
+    }
+
+    const removed = await deleteEntry(id);
 
     if (!removed) {
       response.status(404).json({ error: 'Entry not found' });
@@ -180,6 +194,14 @@ app.use((error, _request, response, _next) => {
 app.listen(port, () => {
   console.log(`Journal app listening on port ${port}`);
 });
+
+function parseEntryId(value) {
+  if (!/^\d+$/.test(String(value))) {
+    return null;
+  }
+
+  return value;
+}
 
 function parseEntryPayload(body) {
   const title = sanitizeText(body?.title);
