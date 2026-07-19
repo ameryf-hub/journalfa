@@ -1,0 +1,8 @@
+{
+    "chat.byokUtilityModelDefault": "mainAgent",
+    "chat.utilitySmallModel": "deepseek/deepseek-v4-pro",
+    "chat.utilityModel": "deepseek/deepseek-v4-pro",
+    "workbench.preferredHighContrastColorTheme": "Dark Modern",
+    "workbench.preferredHighContrastLightColorTheme": "Dark 2026",
+    "workbench.preferredLightColorTheme": "Dark+"
+}
